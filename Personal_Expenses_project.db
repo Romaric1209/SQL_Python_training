@@ -1,0 +1,8 @@
+create table expenses (
+	expense_id SERIAL PRIMARY key,
+	user_id INTEGER references users(user_id),
+	amount numeric(10,2),
+	date DATE,
+	category_id INTEGER references categories(category_id),
+	description TEXT
+	);
