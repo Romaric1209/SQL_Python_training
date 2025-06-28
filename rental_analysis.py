@@ -64,3 +64,17 @@ print(avg_rental_duration_df)
 
 conn.commit()
 conn.close()
+
+
+
+
+WITH rental_durations AS (
+    SELECT
+        c.first_name || ' ' || c.last_name AS full_name,
+        extract(epoch FROM (now()::timestamp - r.rental_date::timestamp)) / 86400 AS duration_days
+    FROM customers c
+    LEFT JOIN rentals r ON c.customer_id = r.customer_id
+)
+SELECT *
+FROM rental_durations
+WHERE duration_days > 30;
