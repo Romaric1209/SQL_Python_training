@@ -6,7 +6,7 @@ conn = psycopg2.connect(
     host="localhost",
     database="rental_movie_store",
     user="postgres",
-    password="berger"
+    password="*"
 )
 
 # 🧩 Business Problems to Solve:
@@ -33,15 +33,6 @@ limit 3;
 top_3c_df = pd.read_sql(top_3_customers_query, conn)
 print(top_3c_df)
 
-plt.figure(figsize=(8, 5))
-plt.bar(top_3c_df['name'], top_3c_df['total_rental_spent'], color='skyblue')
-plt.title("Top 3 Customers by Rental Spend", fontsize=14, fontweight='bold')
-plt.xlabel("Customer Name")
-plt.ylabel("Total Rental Spent")
-plt.xticks(rotation=30)
-plt.tight_layout()
-plt.show()
-
 # Which movie genres are the most popular by number of rentals?
 top_genres_query = '''select
 m.genre as genre,
@@ -53,6 +44,7 @@ order by count desc
 limit 3;'''
 top_genres_df = pd.read_sql(top_genres_query,conn)
 print(top_genres_df)
+
 
 # What is the average rental duration per genre?
 avg_rental_duration_query = '''with rental_duration as(
@@ -101,6 +93,45 @@ limit 1;
 '''
 best_renting_df = pd.read_sql(best_renting_query,conn)
 print(best_renting_df)
+
+# Who are the top 3 customers by total rental spend?
+
+# Which movie genres are the most popular by number of rentals?
+
+# What is the average rental duration per genre?
+
+# Which customers have not rented anything in the past 30 days?
+
+# Which movie has the highest return rate (rented the most times)?
+
+fig,ax =plt.subplot_mosaic("""
+                   AB
+                   CC
+                   """)
+ax['A'].bar(top_3c_df['name'], top_3c_df['total_rental_spent'], color='skyblue')
+ax['A'].set_title("Top 3 Customers by Rental Spend")
+ax['A'].set_xlabel("Customer Name")
+ax['A'].set_ylabel("Total Rental Spent")
+ax['A'].tick_params(axis='x', rotation=30)
+
+ax['A'].yaxis.set_major_formatter('${x:1.2f}')
+ax['A'].grid(axis='y',which='major', linestyle='dashed', alpha=0.5, color='red')
+
+ax['B'].bar(top_genres_df['genre'], top_genres_df['count'], color='green')
+ax['B'].set_title("Top 3 Genre of movie by Number of Rental")
+ax['B'].set_xlabel("Genre")
+ax['B'].set_ylabel("Number of Rental")
+ax['B'].tick_params(axis='x', rotation=30)
+
+ax['C'].bar(avg_rental_duration_df['genre'], avg_rental_duration_df['average_rental_duration'], color='red')
+ax['C'].set_title("Average Rental Duration by Genre in Days")
+ax['C'].set_xlabel("Genre")
+ax['C'].set_ylabel("Days")
+ax['C'].tick_params(axis='x', rotation=30)
+ax['C'].grid(axis='y', linestyle = 'dashed', alpha=0.4, color= 'blue')
+
+plt.tight_layout()
+plt.show()
 
 conn.commit()
 conn.close()
