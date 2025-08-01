@@ -1,0 +1,117 @@
+--create table customers(
+--	customer_id SERIAL primary key,
+--	first_name VARCHAR(50),
+--	last_name VARCHAR(50),
+--	email VARCHAR(100) unique,
+--	date DATE
+--	);
+----create table movies(
+--	movie_id SERIAL primary key,
+--	title VARCHAR,
+--	genre VARCHAR(50),
+--	duration_mins NUMERIC(3)
+--	);
+--create table rental(
+--	rental_id SERIAL primary key,
+--	curstomer_id integer references customers(customer_id),
+--	movie_id integer references movies(movie_id),
+--	rental_date DATE,
+--	return_date DATE,
+--	price NUMERIC(2,2)
+--	);
+--alter table customers rename column date to signup_date;
+--insert into customers(customer_id,first_name,last_name,email,signup_date)
+--VALUES
+--	(1,'John','Doe','john@example.com','2023-01-12'),
+--	(2,'Jane','Smith','jane@example.com','2023-03-15'),
+--	(3,'Bob','Johnson','bob@example.com','2023-04-01'),
+--	(4,'Alice','Wong','alice@example.com','2023-02-28'),
+--	(5,'Charlie','Brown','charlie@example.com','2023-05-05'),
+--	(6,'Eva','Martinez','eva@example.com','2023-06-01');
+--insert into movies(movie_id,title,genre,duration_mins)
+--values
+--	(1,'The Matrix','Sci-Fi',136),
+--	(2,'Finding Nemo','Animation',100),
+--	(3,'Inception','Sci-Fi',148),
+--	(4,'The Godfather','Crime',175),
+--	(5,'Toy Story','Animation',81),
+--	(6,'Titanic','Romance',195),
+--	(7,'The Dark Knight','Action',152),
+--	(8,'Shrek','Animation',90);
+--alter table rental rename column curstomer_id to customer_id
+--drop table if exists rental;
+--CREATE TABLE rentals (
+--    rental_id SERIAL PRIMARY KEY,
+--    customer_id INTEGER REFERENCES customers(customer_id),
+--    movie_id INTEGER REFERENCES movies(movie_id),
+--    rental_date DATE,
+--    return_date DATE,
+--    price NUMERIC(5,2)
+--);
+
+-- Who are the top 3 customers by total rental spend?
+
+--select 
+--sum(r.price) as total_rental_spent,
+--c.first_name ||' '|| c.last_name as name
+--from rentals r
+--left join customers c on r.customer_id = c.customer_id
+--group by r.customer_id, name
+--order by total_rental_spent desc
+--limit 3;
+
+-- Which movie genres are the most popular by number of rentals?
+--select
+--m.genre as genre,
+--sum(r.movie_id) as count
+--from movies m
+--left join rentals r on m.movie_id = r.movie_id
+--group by genre
+--order by count desc
+--limit 3;
+--
+--What is the average rental duration per genre?
+--with rental_duration as(
+--select
+--	r.movie_id,
+--	extract(epoch from (r.return_date::timestamp - r.rental_date::timestamp)) / 86400 as duration_days
+--from rentals r 
+--where r.return_date is not null
+--)
+--select 
+--m.genre,
+--round(avg(rd.duration_days),2) as average_rental_duration
+--from rental_duration rd
+--left join movies m on rd.movie_id = m.movie_id
+--group by m.genre
+--order by average_rental_duration desc;
+--
+-- Which customers have not rented anything in the past 30 days?
+
+--select 
+--c.first_name ||''|| c.last_name,
+--extract(epoch from (now()::timestamp - r.rental_date::timestamp)) /86400 as duration_days
+--from customers c
+--left join rentals r on c.customer_id = r.customer_id
+--where duration_days > 30;
+--ERROR: column "duration_days" does not exist
+--happens because you can't use an alias (duration_days) in the WHERE clause — SQL evaluates the WHERE clause before it calculates SELECT expressions.
+--WITH rental_durations AS (
+--    SELECT 
+--        c.first_name || ' ' || c.last_name AS full_name,
+--        extract(epoch FROM ('2024-07-15'::timestamp - r.rental_date::timestamp)) / 86400 AS duration_days
+--    FROM customers c
+--    LEFT JOIN rentals r ON c.customer_id = r.customer_id
+--)
+--SELECT *
+--FROM rental_durations
+--WHERE duration_days > 30;
+
+--# Which movie has the highest return rate (rented the most times)?
+
+--select m.title, sum(r.movie_id) as number_of_rent
+--from movies m
+--left join rentals r on m.movie_id = r.movie_id
+--group by m.title
+--order by number_of_rent desc
+--limit 1;
